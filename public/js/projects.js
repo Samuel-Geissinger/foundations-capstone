@@ -67,7 +67,7 @@ const loadTicket = (ticket) => {
   } = ticket;
 //   const div = document.createElement('div');
   const ticketHTML = `
-            <div class="task-grid" id="${ticket_id}" onclick="openTicket()">
+            <div class="task-grid" id="${ticket_id}" onclick="openTicket(${ticket_id})">
               <div class="project-bullet">&#8226;</div>
               <div class="project-title">Task Title</div>
               <div class="project-due-date">Due Date</div>
@@ -94,43 +94,49 @@ const loadTicket = (ticket) => {
   return ticketHTML;
 };
 
-const openTicket = () => {
-    const dialog = `
-    <dialog open id="dialog">
+const openTicket = (ticketId) => {
+    
+    let dialog = '';
+    
+    axios
+      .get(`http://localhost:3005/api/tickets/${ticketId}`)
+      .then((res) => {
+        const {
+          ticket_id,
+          ticket_name,
+          ticket_due,
+          ticket_priority,
+          ticket_created,
+          ticket_notes,
+        } = res.data[0];
+        dialog = `
         <form>
             <div class="top">
-                <h2 class="title">Name of Ticket</h2>
+                <h2 class="title">${ticket_name}</h2>
                 <div class="date">
-                    <h4 class="title">Created Date</h4>
-                    <h4 class="title">Due Date</h4>
+                    <h4 class="title">${ticket_created}</h4>
+                    <h4 class="title">${ticket_due}</h4>
                 </div>
             </div>
             <div class="middle">
                 <div class="checkbox">
-                    <label><input type="checkbox" /> Checkbox 1</label>
-                    <label><input type="checkbox" /> Checkbox 2</label>
-                    <label><input type="checkbox" /> Checkbox 3</label>
-                    <textarea></textarea>
+                    <textarea id="checkbox-notes"></textarea>
                 </div>
 
                 <div class="comments">
-                    <label><img src="http://placehold.it/" />Comment 1</label>
-                    <label><img src="http://placehold.it/" />Comment 2</label>
-                    <label><img src="http://placehold.it/" />Comment 3</label>
-                    
-                    <textarea></textarea>
+                    <textarea id="comment-notes"></textarea>
                 </div>
             </div>
 
             <div class="notes-container">
-                <textarea class="notes" cols="30" rows="10" spellcheck="true"></textarea>
+                <textarea class="notes" cols="30" rows="10" spellcheck="true">${ticket_notes}</textarea>
             </div>
 
 
             <div class="bottom-level">
                 <div class="priority-level">
                     <label>Priority Level:</label>
-                    <select>
+                    <select id="priority-level">
                         <option value="1">1</option>
                         <option value="2">2</option>
                         <option value="3">3</option>
@@ -140,8 +146,50 @@ const openTicket = () => {
                 </div>
                 <button>Save</button>
             </div>
-        </form>
-    </dialog>`;
+        </form>`;
+
+
+        const dialogTag = document.getElementById("dialog");
+        dialogTag.innerHTML = dialog; 
+
+        getComments(ticket_id);
+        getCheckboxes(ticket_id);
+      })
+      .catch((error) => console.log(error));
+};
+
+
+const getComments = (ticketId) => {
+    const commentsDiv = document.querySelector(".comments");
+    axios
+      .get(`http://localhost:3005/api/comments/${ticketId}`)
+      .then((response) => {
+        response.data.map(
+          (comment) =>
+            (commentsDiv.innerHTML += `<label>
+    <img src="http://placehold.it/" />
+    ${comment.comment}
+    </label>`)
+        );
+      })
+      .catch((error) => console.log(error));
+}
+
+const getCheckboxes = (ticketId) => {
+  const checklistDiv = document.querySelector(".checkbox");
+
+  axios
+    .get(`http://localhost:3005/api/checkbox/${ticketId}`)
+    .then((response) => {
+      response.data.map(
+        (checkbox) =>
+          (checklistDiv.innerHTML += `
+            <label><input type="checkbox" /> ${checkbox.checklist_description}</label>
+            
+            `)
+      );
+    })
+    .catch((error) => console.log(error));
 };
 
 

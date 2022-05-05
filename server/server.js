@@ -16,6 +16,9 @@ const {
   getProjects,
   getTicket,
   getProject,
+  getSingleTicket,
+  getComments,
+  getChecklist,
 } = require("./controllers/projectController");
 
 app.get('/', (req, res) => {
@@ -36,6 +39,12 @@ app.post(`/api/user/auth`, login);
 app.get(`/api/projects/single`, getProject);
 app.get(`/api/projects`, getProjects);
 app.post(`/api/projects`, getTicket);
+
+
+app.get(`/api/tickets/:id`, getSingleTicket);
+app.get(`/api/comments/:id`, getComments);
+app.get(`/api/checkbox/:id`, getChecklist);
+
 
 const port = process.env.SERVER_PORT || 4050;
 app.listen(port, () => console.log(`listening on port: ${port}`));
