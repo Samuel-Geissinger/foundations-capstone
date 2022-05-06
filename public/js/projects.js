@@ -110,10 +110,10 @@ const openTicket = (ticketId) => {
         dialog = `
         <form>
             <div class="top">
-                <h2 class="title">${ticket_name}</h2>
+                <h2 id="name-${ticket_id}" class="title">${ticket_name}</h2>
                 <div class="date">
                     <h4 class="title">Date Created: ${ticket_created}</h4>
-                    <h4 class="title">Date Due: ${ticket_due}</h4>
+                    <h4 id="due-${ticket_id}" class="title">Date Due: ${ticket_due}</h4>
                 </div>
             </div>
             <div class="middle">
@@ -127,7 +127,7 @@ const openTicket = (ticketId) => {
             </div>
 
             <div class="notes-container">
-                <textarea class="notes" cols="30" rows="10" spellcheck="true">${ticket_notes}</textarea>
+                <textarea id="notes-${ticket_id}" class="notes" cols="30" rows="10" spellcheck="true">${ticket_notes}</textarea>
             </div>
 
 
@@ -142,7 +142,7 @@ const openTicket = (ticketId) => {
                         <option value="5">5</option>
                     </select>
                 </div>
-                <button onclick="saveTicket()">Save</button>
+                <button onclick="saveTicket(${ticket_id})">Save</button>
             </div>
         </form>`;
 
@@ -211,7 +211,21 @@ const getCheckboxes = (ticketId) => {
     .catch((error) => console.log(error));
 };
 
-const saveTicket = () => {
+const saveTicket = (ticket_id) => {
+  const ticket_name = document.getElementById(`name-${ticket_id}`);
+  const ticket_priority = document.getElementById("priority-level-select");
+  const ticket_due = document.getElementById(`due-${ticket_id}`);
+  const ticket_notes = document.getElementById(`notes-${ticket_id}`);
+  console.log(ticket_name);
+
+  const updatedTicket = {
+    ticket_id: ticket_id,
+    ticket_name: ticket_name,
+    ticket_due: ticket_due,
+    ticket_priority: ticket_priority,
+    ticket_notes: ticket_notes
+  }
+
 
 }
 
