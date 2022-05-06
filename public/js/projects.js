@@ -65,7 +65,6 @@ const loadTicket = (ticket) => {
     ticket_priority,
     ticket_created,
   } = ticket;
-//   const div = document.createElement('div');
   const ticketHTML = `
             <div class="task-grid" id="${ticket_id}" onclick="openTicket(${ticket_id})">
               <div class="project-bullet">&#8226;</div>
@@ -89,7 +88,6 @@ const loadTicket = (ticket) => {
                 Date Created <span>${ticket_created}</span>
               </div>
             </div>`;
-//   div.innerHTML = ticketHTML;
 
   return ticketHTML;
 };
@@ -114,8 +112,8 @@ const openTicket = (ticketId) => {
             <div class="top">
                 <h2 class="title">${ticket_name}</h2>
                 <div class="date">
-                    <h4 class="title">${ticket_created}</h4>
-                    <h4 class="title">${ticket_due}</h4>
+                    <h4 class="title">Date Created: ${ticket_created}</h4>
+                    <h4 class="title">Date Due: ${ticket_due}</h4>
                 </div>
             </div>
             <div class="middle">
@@ -136,7 +134,7 @@ const openTicket = (ticketId) => {
             <div class="bottom-level">
                 <div class="priority-level">
                     <label>Priority Level:</label>
-                    <select id="priority-level">
+                    <select id="priority-level-select">
                         <option value="1">1</option>
                         <option value="2">2</option>
                         <option value="3">3</option>
@@ -144,13 +142,21 @@ const openTicket = (ticketId) => {
                         <option value="5">5</option>
                     </select>
                 </div>
-                <button>Save</button>
+                <button onclick="saveTicket()">Save</button>
             </div>
         </form>`;
 
 
         const dialogTag = document.getElementById("dialog");
         dialogTag.innerHTML = dialog; 
+
+        const prioritySelection = document.getElementById("priority-level-select");
+        for (let i, j = 0; i = prioritySelection.options[j]; j++) {
+          if (+i.value === ticket_priority) {
+            prioritySelection.selectedIndex = j;
+            break;
+          }
+        }
 
         getComments(ticket_id);
         getCheckboxes(ticket_id);
@@ -164,12 +170,14 @@ const getComments = (ticketId) => {
     axios
       .get(`http://localhost:3005/api/comments/${ticketId}`)
       .then((response) => {
-        response.data.map(
-          (comment) =>
-            (commentsDiv.innerHTML += `<label>
+        response.data.map((comment) =>
+          commentsDiv.insertAdjacentHTML(
+            "afterbegin",
+            `<label>
     <img src="http://placehold.it/" />
     ${comment.comment}
-    </label>`)
+    </label>`
+          )
         );
       })
       .catch((error) => console.log(error));
@@ -182,15 +190,36 @@ const getCheckboxes = (ticketId) => {
     .get(`http://localhost:3005/api/checkbox/${ticketId}`)
     .then((response) => {
       response.data.map(
-        (checkbox) =>
-          (checklistDiv.innerHTML += `
-            <label><input type="checkbox" /> ${checkbox.checklist_description}</label>
-            
-            `)
+        (checkbox) => {
+          checklistDiv.insertAdjacentHTML("afterbegin", `
+            <label><input type="checkbox" id="${checkbox.checklist_id}" class="checklist-boxes" /> ${checkbox.checklist_description}</label>
+            `);}    
       );
+          const checklist = document.querySelectorAll(".checklist-boxes");
+          response.data.map(checkboxes => {
+            checklist.forEach((check) => {
+              if (
+                check.id === checkboxes.checklist_id &&
+                checkboxes.is_completed
+              ) {
+                check.checked = true;
+              }
+            });
+
+          })
     })
     .catch((error) => console.log(error));
 };
+
+const saveTicket = () => {
+
+}
+
+const createTicket = () => {
+  const today = new Date();
+  const currentDate = `${today.getDate()}/${today.getMonth + 1}/${today.getFullYear}`;
+
+}
 
 
 getAllTickets();
