@@ -65,27 +65,27 @@ module.exports = {
   },
 
   editTicket: (req, res) => {
-    const {
-      ticketName,
-      ticketNotes,
-      ticketPriority,
-      ticketCompletedNotes,
-      ticketCompleted,
-      ticketID,
-    } = req.body;
+    const { ticketName, ticketNotes, ticketPriority, ticketID, ticketDue } =
+      req.body;
 
-    sequelize.query(`
+    sequelize
+      .query(
+        `
         UPDATE tickets
         SET ticket_name = '${ticketName}',
-          ticket_due = date,
-          ticket_done = date,
+          ticket_due = ${ticketDue},
           ticket_notes = '${ticketNotes}',
-          ticket_priority = ${ticketPriority},
-          ticket_completed_notes = '${ticketCompletedNotes}',
-          ticket_completed = ${ticketCompleted},
+          ticket_priority = ${ticketPriority}
         WHERE ticket_id = ${ticketID};
       
-      `);
+      `
+      )
+      .then((dbRes) => {
+        res.status(200).send("Added");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   },
 
   deleteTicket: (req, res) => {
@@ -145,5 +145,35 @@ module.exports = {
       )
       .then((dbRes) => res.status(200).send(dbRes[0]))
       .catch((err) => console.log(err));
+  },
+  addTicket: (req, res) => {
+    const {
+      ticket_name,
+      ticket_notes,
+      ticket_priority,
+      ticket_due,
+      project_id,
+      ticket_created,
+      user_id,
+    } = req.body;
+
+    sequelize
+      .query(
+        `
+      INSERT INTO tickets
+      (project_id, 
+      user_id, 
+      ticket_name, 
+      ticket_created, 
+      ticket_priority, 
+      ticket_completed,
+      ticket_notes,
+      ticket_due)
+      VALUES
+        (${project_id}, ${user_id}, '${ticket_name}', '${ticket_created}', ${ticket_priority}, FALSE, '${ticket_notes}', '${ticket_due}')
+    `
+      )
+      .then((dbRes) => res.status(200).send(dbRes[0])).catch((err) => console.log(err));
+
   }
 };

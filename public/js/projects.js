@@ -3,8 +3,9 @@ const confirm = document.querySelector("#confirmation");
 const tickets = document.querySelector("#tickets");
 const comboBox = document.querySelector(".projects-box");
 
-
-
+const saveNewTicket = document.querySelector("#create-new-ticket");
+const projectAttach = document.querySelector("#project-attach");
+let username = 0;
 const getAllTickets = () => {
     axios
     .get(
@@ -14,6 +15,7 @@ const getAllTickets = () => {
     .then((response) => {
         for(let i = comboBox.options.length; i > -1; i--) {
             comboBox.remove(i);
+            projectAttach.remove(i);
         }
 
         const all = document.createElement("option");
@@ -26,6 +28,13 @@ const getAllTickets = () => {
         options.text = e.project_name;
         options.value = `project_id=${e.project_id}`;
         comboBox.add(options);
+        
+        
+        
+        const option = document.createElement("option");
+        option.text = e.project_name;
+        option.value = `project_id=${e.project_id}`;
+        projectAttach.add(option);
         });
         response.data.map((e) => getTicket(e));
     })
@@ -53,6 +62,7 @@ const getProjects = () => {
 
 const getTicket = (ticket) => {
     axios.post(baseURL, ticket).then((res) => {
+      username = res.data[0].user_id;
       res.data.map((e) => (tickets.innerHTML += loadTicket(e)));
     });
 }
@@ -142,7 +152,7 @@ const openTicket = (ticketId) => {
                         <option value="5">5</option>
                     </select>
                 </div>
-                <button onclick="saveTicket(${ticket_id})">Save</button>
+                <button id="save-button">Save</button>
             </div>
         </form>`;
 
@@ -151,12 +161,18 @@ const openTicket = (ticketId) => {
         dialogTag.innerHTML = dialog; 
 
         const prioritySelection = document.getElementById("priority-level-select");
-        for (let i, j = 0; i = prioritySelection.options[j]; j++) {
-          if (+i.value === ticket_priority) {
-            prioritySelection.selectedIndex = j;
+        for (let i = 0; i < prioritySelection.length; i++) {
+          if (+prioritySelection.options[i].value === ticket_priority) {
+            prioritySelection.selectedIndex = i;
             break;
           }
         }
+
+        const saveButton = document.getElementById('save-button');
+        saveButton.addEventListener('click', (e) => {
+          e.preventDefault();
+          saveTicket(ticket_id);
+        })
 
         getComments(ticket_id);
         getCheckboxes(ticket_id);
@@ -174,9 +190,9 @@ const getComments = (ticketId) => {
           commentsDiv.insertAdjacentHTML(
             "afterbegin",
             `<label>
-    <img src="http://placehold.it/" />
-    ${comment.comment}
-    </label>`
+              <img src="http://placehold.it/" />
+              ${comment.comment}
+            </label>`
           )
         );
       })
@@ -198,10 +214,7 @@ const getCheckboxes = (ticketId) => {
           const checklist = document.querySelectorAll(".checklist-boxes");
           response.data.map(checkboxes => {
             checklist.forEach((check) => {
-              if (
-                check.id === checkboxes.checklist_id &&
-                checkboxes.is_completed
-              ) {
+              if (check.id === checkboxes.checklist_id && checkboxes.is_completed) {
                 check.checked = true;
               }
             });
@@ -212,28 +225,65 @@ const getCheckboxes = (ticketId) => {
 };
 
 const saveTicket = (ticket_id) => {
-  const ticket_name = document.getElementById(`name-${ticket_id}`);
-  const ticket_priority = document.getElementById("priority-level-select");
-  const ticket_due = document.getElementById(`due-${ticket_id}`);
-  const ticket_notes = document.getElementById(`notes-${ticket_id}`);
-  console.log(ticket_name);
+  const ticket_name = document.getElementById(`name-${ticket_id}`).innerHTML;
+  const ticket_priority = document.getElementById("priority-level-select").value;
+  const ticketDue = document.getElementById(`due-${ticket_id}`).innerHTML;
+  const ticket_notes = document.getElementById(`notes-${ticket_id}`).value;
+  const ticket_due = ticketDue.split(' ')[2];
+  console.log(ticket_name, ticket_priority, ticket_due, ticket_notes);
 
   const updatedTicket = {
-    ticket_id: ticket_id,
-    ticket_name: ticket_name,
-    ticket_due: ticket_due,
-    ticket_priority: ticket_priority,
-    ticket_notes: ticket_notes
-  }
-
+    ticketID: ticket_id,
+    ticketName: ticket_name,
+    ticketDue: ticket_due,
+    ticketPriority: +ticket_priority,
+    ticketNotes: ticket_notes,
+  };
+  axios.put(`http://localhost:3005/api/tickets`, updatedTicket).then(res => {
+    console.log('updated Ticket successfully', res.data);
+  }).catch(err => {console.log(err)});
 
 }
 
-const createTicket = () => {
+const createTicket = (e) => {
+  e.preventDefault();
   const today = new Date();
-  const currentDate = `${today.getDate()}/${today.getMonth + 1}/${today.getFullYear}`;
+  const currentDate =
+    today.getFullYear() +
+    "/" +
+    String(today.getMonth() + 1).padStart(2, "0") +
+    "/" +
+    String(today.getDate()).padStart(2, "0");
+  
+  const name = document.getElementById('new-name').value;
+  const notes = document.getElementById('new-notes').value;
+  const priority = document.getElementById('new-priority-level-select').value;
+  const dueDate = document.getElementById("new-due-date").value.split('-');
+  const project = document.getElementById("project-attach").value.split("=")[1];
+  const newDuedate = dueDate.join("/");
+  
+  const newTicket = {
+    ticket_name: name,
+    ticket_notes: notes,
+    ticket_priority: priority,
+    ticket_due: newDuedate,
+    project_id: project,
+    ticket_created: currentDate,
+    user_id: username
+  };
 
+  axios.post(`http://localhost:3005/api/tickets`, newTicket)
+  .then(response => {
+    document.getElementById("new-due-date").value = '';
+    document.getElementById('new-name').value = '';
+    document.getElementById('new-notes').value = '';
+    document.getElementById('new-priority-level-select').value = 1;
+    console.log(response.data);
+  }).catch(err => {console.log(err);});
 }
 
+
+
+saveNewTicket.addEventListener("click", createTicket);
 
 getAllTickets();
