@@ -5,6 +5,9 @@ const comboBox = document.querySelector(".projects-box");
 
 const saveNewTicket = document.querySelector("#create-new-ticket");
 const projectAttach = document.querySelector("#project-attach");
+const saveNewProject = document.querySelector("#save-new-project");
+
+
 let username = 0;
 const getAllTickets = () => {
     axios
@@ -283,7 +286,23 @@ const createTicket = (e) => {
 }
 
 
+const createProject = (e) => {
+  e.preventDefault();
+  const projectName = document.getElementById('create-project-input').value;
+  const newProject = {
+    project_name: projectName,
+    user_id: username
+  };
 
+  axios.post(`http://localhost:3005/api/createproject`, newProject)
+  .then(response => {
+    console.log(response.data);
+  });
+  
+}
+
+
+saveNewProject.addEventListener('click', createProject);
 saveNewTicket.addEventListener("click", createTicket);
 
 getAllTickets();

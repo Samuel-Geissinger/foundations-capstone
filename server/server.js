@@ -21,6 +21,7 @@ const {
   getChecklist,
   editTicket,
   addTicket,
+  createProject
 } = require("./controllers/projectController");
 
 app.get('/', (req, res) => {
@@ -41,6 +42,8 @@ app.post(`/api/user/auth`, login);
 app.get(`/api/projects/single`, getProject);
 app.get(`/api/projects`, getProjects);
 app.post(`/api/projects`, getTicket);
+app.post(`/api/createproject`, createProject);
+
 
 
 app.get(`/api/tickets/:id`, getSingleTicket);

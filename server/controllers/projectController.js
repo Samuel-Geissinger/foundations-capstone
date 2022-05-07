@@ -175,5 +175,20 @@ module.exports = {
       )
       .then((dbRes) => res.status(200).send(dbRes[0])).catch((err) => console.log(err));
 
+  },
+
+  createProject: (req, res) => {
+    const { project_name, user_id } = req.body;
+
+    sequelize.query(`
+        WITH new_project AS (
+          INSERT INTO projects (project_name, is_completed)
+          VALUES ('${project_name}', FALSE)
+          RETURNING project_id
+        )
+        INSERT INTO user_project (user_id, project_id)
+        SELECT ${user_id}, project_id
+        FROM new_project;
+    `).then((dbRes) => res.status(200).send(dbRes)).catch((err) => console.log(err));
   }
 };
