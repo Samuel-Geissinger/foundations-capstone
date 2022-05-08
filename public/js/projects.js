@@ -92,7 +92,7 @@ const loadTicket = (ticket) => {
     ticket_created,
   } = ticket;
   const ticketHTML = `
-            <div class="task-grid" id="${ticket_id}" onclick="openTicket(${ticket_id})">
+            <div class="task-grid" id="${ticket_id}" onclick="openTicket(${ticket_id}, event)">
               <div class="project-title">Task Title:</div>
               <div class="project-due-date">Due Date:</div>
               <div class="project-date-create">Date Created:</div>
@@ -108,14 +108,17 @@ const loadTicket = (ticket) => {
               </div>
 
 
-              <button class="ticket-delete-button" data-id="${ticket_id}" onclick="deleteTicket(${ticket_id}, this, event)">Delete</button>
+              <button class="ticket-delete-button" data-id="${ticket_id}" onclick="deleteTicket(${ticket_id})">Delete</button>
             </div>`;
 
   return ticketHTML;
 };
 
-const openTicket = (ticketId, e) => {
-    console.log(e);
+const openTicket = (ticketId, event) => {
+    if (event.target.tagName === 'BUTTON') {
+      return;
+    }  
+  
     let dialog = '';
     
     axios
@@ -334,10 +337,8 @@ const createProject = (e) => {
   });
 }
 
-const deleteTicket = (ticket_id, el, event) => {
-  console.log(event);
-  event.preventDefault();
-  if(confirm('Are you sure you want to delete?')) {
+const deleteTicket = (ticket_id) => {
+  if(window.confirm('Are you sure you want to delete?')) {
     axios.delete(`/api/tickets/${ticket_id}`)
     .then(res => {
       console.log(res.data);

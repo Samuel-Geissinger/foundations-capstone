@@ -2,29 +2,28 @@ const baseURL = `http://localhost:3005/api/user/auth`;
 const loginDiv = document.querySelector(".login");
 const register = `
     <div class="login-sign-in register">
-        <h2>Register</h2>
-        <div class="user-inputs">
-            <input placeholder="Enter your username" type="text" id="username"/>
-            <input placeholder="Enter your password" type="password" id="password"/>
-            <input placeholder="Confirm your password" type="password" id="confirm-password"/>
-        </div>
-        <div class="sign-in-buttons">
-            <button onclick="changeScreen()">Sign In</button>
-            <button onclick="registerUser()">Register</button>
-        </div>
+        <h2 class="title" >Register</h2>
+
+        <input placeholder="Enter your username" type="text" id="username"/>
+        <input placeholder="Enter your password" type="password" id="password"/>
+        <input placeholder="Confirm your password" type="password" id="confirm-password"/>
+
+        <button class="top-button" onclick="changeScreen()">Sign In</button>
+        <button class="bottom-button" onclick="registerUser()">Register</button>
+
     </div>`;
 
 const login = `
     <div class="login-sign-in login">
-        <h2>Sign In</h2>
-        <div class="user-inputs">
-            <input placeholder="Enter your username" type="text" id="username"/>
-            <input placeholder="Enter your password" type="password" id="password"/>
-        </div>
-        <div class="sign-in-buttons">
-            <button onclick="changeScreen()">Register</button>
-            <button onclick="loginUser()">Sign In</button>
-        </div>
+        <h2 class="title" >Sign In</h2>
+
+        <input placeholder="Enter your username" type="text" id="username"/>
+        <input placeholder="Enter your password" type="password" id="password"/>
+
+
+        <button class="top-button" onclick="changeScreen()">Register</button>
+        <button class="bottom-button" onclick="loginUser()">Sign In</button>
+
     </div>`;
 
 loginDiv.innerHTML = login;

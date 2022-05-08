@@ -5,31 +5,37 @@ body {
     align-content: center;
     justify-content: center;
 }
+
 .login-sign-in {
-    display: flex;
-    height: 20vh;
-    width: 40vw;
-    flex-direction: column;
+    display: grid;
     align-items: center;
     justify-content: center;
     gap: 15%;
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(6, 1fr);
 }
 
-.sign-in-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 50%;
-    width: 100%;
+.title {
+    grid-row: 1;
 }
-button {
-    width: 20%;
-    height: 100%;
-    text-align: center;
+
+
+#username {
+    grid-row: 2;
 }
-.user-inputs {
-    display: flex;
-    height: 25%;
-    width: 25%;
-    flex-direction: column;
-    gap: 10%;
+
+#password {
+    grid-row: 3;
+}
+
+#confirm-password {
+    grid-row: 4;
+}
+
+.top-button {
+    grid-row: 5;
+}
+
+.bottom-button {
+    grid-row: 6;
 }
