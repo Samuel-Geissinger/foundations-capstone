@@ -1,56 +1,58 @@
 .task-grid {
-display: grid;
-margin: 10px 25px;
-padding: 10px;
-border-radius: 10px;
-color: white;
-background: linear-gradient(90deg, #47126B 0%, #973AA8 100%);
-grid-template-columns: 1fr 1fr 1fr 1fr;
-grid-template-rows: repeat(4, minmax(10px, 25px));
+    display: grid;
+    margin: 10px 25px;
+    padding: 10px;
+    border-radius: 10px;
+    color: white;
+    background: linear-gradient(90deg, #47126B 0%, #973AA8 100%);
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-rows: repeat(4, minmax(10px, 25px));
+    cursor: pointer;
 }
 
 .project-bullet {
-font-size: 5rem;
-font-weight: 900;
-color: #973AA8;
-grid-column: 1;
-grid-row: 1 / 2;
-margin-top: -50px
+    font-size: 5rem;
+    font-weight: 900;
+    color: #973AA8;
+    grid-column: 1;
+    grid-row: 1 / 2;
+    margin-top: -50px
 }
 
 .project-title {
-grid-column: 2;
+    grid-column: 2;
 }
 
 .project-due-date {
-grid-column: 3;
+    grid-column: 3;
 }
 
 .project-days-hours-left {
-grid-column: 4;
+    grid-column: 4;
 }
 
 .project-details {
-grid-column: 1 / 5;
+    grid-column: 1 / 5;
 }
 
 .project-priority {
-grid-column: 1 / 2;
+    grid-column: 1 / 2;
 }
 
 .project-date-created {
-grid-column: 2 / 5;
-text-align: right;
+    grid-column: 2 / 5;
+    text-align: right;
 }
 
-
-
-
-#dialog {
-    display: flex;
-    justify-content: space-between;
-    position: static;
+dialog {
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    -moz-transform: translateX(-50%) translateY(-50%);
+    -ms-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
 }
+
 
 .title {
     display: inline;
@@ -116,4 +118,61 @@ text-align: right;
     flex-direction: row;
     align-content: center;
     justify-content: space-around;
+}
+
+
+.header-text {
+    width: 100%;
+    font-size: 1.2rem;
+    background: linear-gradient(90deg, #47126B 0%, #973AA8 100%);
+    color: #ffffff;
+    margin-top: -3px;
+    margin-bottom: 3px;
+    padding: 5px;
+    text-align: center;
+}
+
+.top {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+fieldset {
+    width: 100%;
+}
+
+.title-name {
+    cursor: pointer;
+}
+
+#confirmation {
+    top: 0;
+    position: fixed; 
+    width: 100%;
+    background-color: #47126B;
+    height: 40px; 
+    padding-top: 5px;
+}
+
+#tickets {
+    margin-top: 50px;
+}
+
+.projects-box {
+    margin-left: 15px;
+}
+
+#logout {
+    position: fixed;
+    right: 0;
+    margin-right: 15px;
+}
+
+.ticket-delete-button {
+    grid-row: 4;
+    grid-column: 5;
+    width: 75px;
+    height: 30px;
+    
 }

@@ -14,33 +14,28 @@
         </select>
         <button id="add-project">Add Project:</button>
         <button id="add-ticket">Add Ticket:</button>
+        <button id="logout">Logout</button>
     </section>
 
     <main id="tickets">
     </main>
 
     <dialog closed="true" id="dialog"></dialog>
-
+        
     </dialog>
 
 
 
-    <dialog open id="create-ticket">
+    <dialog closed="true" id="create-ticket">
+        <div class="header-text">Add Ticket</div>
         <div id="top-content">
             <label>Name: <input type="text" id="new-name" /></label>
             <label>Created: 2022/02/05</label>
         </div>
-        <section id="middle-content">
-            <div id="new-checkbox-content">
-                <input id="new-checkbox"/>
-                <button id="new-checkbox-button">+</button>
-            </div>
-            <div id="new-comment-content">
-                <input id="new-comment"/>
-                <button id="new-comment-button">+</button>
-            </div>
-        </section>
-        <textarea id="new-notes"></textarea>
+        <fieldset>
+            <legend style="text-align: center;">Notes</legend>
+            <textarea style="width: 100%;" rows="10" spellcheck="true" id="new-notes"></textarea>
+        </fieldset>
         <div id="bottom-content">
 
             <label>Priority: 
@@ -62,12 +57,20 @@
             
         <label>Due Date: <input type="date" id="new-due-date" /></label>
         <button id="create-new-ticket">Create new ticket</button>
+        <button id="close-new-ticket">Close</button>
     </dialog>
-
-    <dialog open id="create-project">
+    
+    
+    <dialog closed="true" id="create-project">
+        <div class="header-text">Add Project</div>
         <label>Name: <input type="text" id="create-project-input" /></label>
         <button id="save-new-project">Save</button>
+        <button id="close-new-project">Close</button>
     </dialog>
+
+    <dialog closed="true" id="new-name-dialog">
+
+    </dialog> 
 
     <script src="./bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="./axios/dist/axios.min.js"></script>

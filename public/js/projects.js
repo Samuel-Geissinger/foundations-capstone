@@ -8,18 +8,34 @@ const projectAttach = document.querySelector("#project-attach");
 const saveNewProject = document.querySelector("#save-new-project");
 
 
-let username = 0;
+const userID = sessionStorage.getItem("user_id");
+const username = sessionStorage.getItem("username");
+
+const addProjectBtn = document.querySelector("#add-project");
+const addTicketBtn = document.querySelector("#add-ticket");
+
+const projectDialog = document.querySelector("#create-project");
+const ticketDialog = document.querySelector("#create-ticket");
+const editTicketDialog = document.querySelector("#dialog");
+
+
+if (!username) {
+  window.location.href = "/";
+}
+
 const getAllTickets = () => {
+    tickets.innerHTML = '';
     axios
     .get(
-        `${baseURL}?username=${localStorage.getItem("username")}`,
-        localStorage.getItem("username")
-    )
+        `${baseURL}?username=${username}`, username)
     .then((response) => {
-        for(let i = comboBox.options.length; i > -1; i--) {
-            comboBox.remove(i);
-            projectAttach.remove(i);
-        }
+        comboBox.options.length = 0;
+        projectAttach.options.length = 0;
+      
+        // for(let i = comboBox.options.length; i > -1; i--) {
+        //     comboBox.remove(i);
+        //     projectAttach.remove(i);
+        // }
 
         const all = document.createElement("option");
         all.value = 'all';
@@ -54,9 +70,7 @@ const getProjects = () => {
         const splitValue = value.split('=');
         axios
           .get(
-            `${baseURL}/single?username=${localStorage.getItem(
-              "username"
-            )}&project_id=${splitValue[1]}`
+            `${baseURL}/single?username=${username}&project_id=${splitValue[1]}`
             //localStorage.getItem("username")
           )
           .then((response) => response.data.map((e) => getTicket(e)));
@@ -65,7 +79,6 @@ const getProjects = () => {
 
 const getTicket = (ticket) => {
     axios.post(baseURL, ticket).then((res) => {
-      username = res.data[0].user_id;
       res.data.map((e) => (tickets.innerHTML += loadTicket(e)));
     });
 }
@@ -80,33 +93,29 @@ const loadTicket = (ticket) => {
   } = ticket;
   const ticketHTML = `
             <div class="task-grid" id="${ticket_id}" onclick="openTicket(${ticket_id})">
-              <div class="project-bullet">&#8226;</div>
-              <div class="project-title">Task Title</div>
-              <div class="project-due-date">Due Date</div>
-              <div class="project-days-hours-left">Days/Hours Left</div>
+              <div class="project-title">Task Title:</div>
+              <div class="project-due-date">Due Date:</div>
+              <div class="project-date-create">Date Created:</div>
 
               
               <div class="project-title">${ticket_name}</div>
-              <div class="project-due-date">${
-                ticket_due === null ? "None" : ticket_due
-              }</div>
+              <div class="project-due-date">${ticket_due === null ? "None" : ticket_due}</div>
+              <div class="project-date-create">${ticket_created}</div>
 
-              <div class="project-details">&nbsp;</div>
 
               <div class="project-priority">
-                Priority <span>${ticket_priority}</span>
+                Priority: <span>${ticket_priority}</span>
               </div>
 
-              <div class="project-date-created">
-                Date Created <span>${ticket_created}</span>
-              </div>
+
+              <button class="ticket-delete-button" data-id="${ticket_id}" onclick="deleteTicket(${ticket_id}, this, event)">Delete</button>
             </div>`;
 
   return ticketHTML;
 };
 
-const openTicket = (ticketId) => {
-    
+const openTicket = (ticketId, e) => {
+    console.log(e);
     let dialog = '';
     
     axios
@@ -121,28 +130,22 @@ const openTicket = (ticketId) => {
           ticket_notes,
         } = res.data[0];
         dialog = `
+        <div class="header-text">Edit Ticket</div>
         <form>
             <div class="top">
-                <h2 id="name-${ticket_id}" class="title">${ticket_name}</h2>
-                <div class="date">
-                    <h4 class="title">Date Created: ${ticket_created}</h4>
-                    <h4 id="due-${ticket_id}" class="title">Date Due: ${ticket_due}</h4>
-                </div>
+                <h4 id="name-${ticket_id}" class="title-name" onclick="editTicketName(${ticket_id}, '${ticket_name}')">${ticket_name}</h4>
             </div>
-            <div class="middle">
-                <div class="checkbox">
-                    <textarea id="checkbox-notes"></textarea>
-                </div>
-
-                <div class="comments">
-                    <textarea id="comment-notes"></textarea>
-                </div>
+            <div class="date">
+                <label class="title">Date Created: ${ticket_created}</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <label class="title">Date Due: <input id="due-${ticket_id}" type="date" value="${ticket_due}"/></label>
             </div>
 
             <div class="notes-container">
-                <textarea id="notes-${ticket_id}" class="notes" cols="30" rows="10" spellcheck="true">${ticket_notes}</textarea>
+                <fieldset>
+                    <legend style="text-align: center;">Notes</legend>
+                    <textarea id="notes-${ticket_id}" class="notes" style="width: 100%" rows="10" spellcheck="true">${ticket_notes}</textarea>
+                </fieldset>
             </div>
-
 
             <div class="bottom-level">
                 <div class="priority-level">
@@ -156,13 +159,13 @@ const openTicket = (ticketId) => {
                     </select>
                 </div>
                 <button id="save-button">Save</button>
+                <button id="close-ticket">Close</button>
             </div>
         </form>`;
 
 
-        const dialogTag = document.getElementById("dialog");
-        dialogTag.innerHTML = dialog; 
-
+        editTicketDialog.innerHTML = dialog; 
+        editTicketDialog.show();
         const prioritySelection = document.getElementById("priority-level-select");
         for (let i = 0; i < prioritySelection.length; i++) {
           if (+prioritySelection.options[i].value === ticket_priority) {
@@ -171,17 +174,46 @@ const openTicket = (ticketId) => {
           }
         }
 
+        document.getElementById('close-ticket').addEventListener('click', (e) => {
+          e.preventDefault();
+          editTicketDialog.close();
+        })
+
         const saveButton = document.getElementById('save-button');
         saveButton.addEventListener('click', (e) => {
           e.preventDefault();
+          editTicketDialog.close();
           saveTicket(ticket_id);
+          getAllTickets();
         })
 
-        getComments(ticket_id);
-        getCheckboxes(ticket_id);
       })
       .catch((error) => console.log(error));
 };
+
+const editTicketName = (ticket_id, ticket_name) => {
+  const dialog = `
+      <input id="new-ticket-name" type="text" placeholder="${ticket_name}" />
+      <button id="save-ticket-name" >Save</button>
+      <button id="close-ticket-name" >Close</button>
+  `;
+  const newNameDialog = document.getElementById(`new-name-dialog`);
+  newNameDialog.innerHTML = dialog;
+  newNameDialog.show();
+
+  const saveTicketName = document.querySelector('#save-ticket-name');
+
+  saveTicketName.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.querySelector(`#name-${ticket_id}`).innerHTML = document.querySelector(`#new-ticket-name`).value; 
+    newNameDialog.close();
+  });
+
+  document.getElementById('close-ticket-name').addEventListener('click', (e) => {
+    e.preventDefault();
+    newNameDialog.close();
+  });
+}
 
 
 const getComments = (ticketId) => {
@@ -230,10 +262,9 @@ const getCheckboxes = (ticketId) => {
 const saveTicket = (ticket_id) => {
   const ticket_name = document.getElementById(`name-${ticket_id}`).innerHTML;
   const ticket_priority = document.getElementById("priority-level-select").value;
-  const ticketDue = document.getElementById(`due-${ticket_id}`).innerHTML;
+  const ticketDue = document.getElementById(`due-${ticket_id}`).value.split('-');
   const ticket_notes = document.getElementById(`notes-${ticket_id}`).value;
-  const ticket_due = ticketDue.split(' ')[2];
-  console.log(ticket_name, ticket_priority, ticket_due, ticket_notes);
+  const ticket_due = ticketDue.join("/");
 
   const updatedTicket = {
     ticketID: ticket_id,
@@ -272,7 +303,7 @@ const createTicket = (e) => {
     ticket_due: newDuedate,
     project_id: project,
     ticket_created: currentDate,
-    user_id: username
+    user_id: userID
   };
 
   axios.post(`http://localhost:3005/api/tickets`, newTicket)
@@ -281,7 +312,8 @@ const createTicket = (e) => {
     document.getElementById('new-name').value = '';
     document.getElementById('new-notes').value = '';
     document.getElementById('new-priority-level-select').value = 1;
-    console.log(response.data);
+    ticketDialog.close();
+    getAllTickets();
   }).catch(err => {console.log(err);});
 }
 
@@ -291,15 +323,58 @@ const createProject = (e) => {
   const projectName = document.getElementById('create-project-input').value;
   const newProject = {
     project_name: projectName,
-    user_id: username
+    user_id: userID
   };
 
   axios.post(`http://localhost:3005/api/createproject`, newProject)
   .then(response => {
-    console.log(response.data);
+    projectDialog.close();
+    document.getElementById('create-project-input').value = '';
+    getAllTickets();
   });
-  
 }
+
+const deleteTicket = (ticket_id, el, event) => {
+  console.log(event);
+  event.preventDefault();
+  if(confirm('Are you sure you want to delete?')) {
+    axios.delete(`/api/tickets/${ticket_id}`)
+    .then(res => {
+      console.log(res.data);
+
+      getAllTickets();
+    })
+    .catch(err => { console.error(err) });
+  }
+} 
+
+
+addProjectBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+  projectDialog.show();
+});
+
+addTicketBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+  ticketDialog.show();
+});
+
+document.getElementById('close-new-project').addEventListener('click', (e) => {
+  e.preventDefault();
+  projectDialog.close();
+});
+
+document.getElementById('close-new-ticket').addEventListener('click', (e) => {
+  e.preventDefault();
+  ticketDialog.close();
+});
+
+document.getElementById('logout').addEventListener('click', (e) => {
+  e.preventDefault();
+  sessionStorage.clear();
+  window.location.href = "/";
+});
+
 
 
 saveNewProject.addEventListener('click', createProject);

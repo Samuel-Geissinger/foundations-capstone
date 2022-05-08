@@ -10,6 +10,9 @@ app.use(cors());
 const {
   login,
   register,
+  getID,
+  updateUser,
+  deleteUser
 } = require("./controllers/userContoller");
 
 const {
@@ -21,7 +24,8 @@ const {
   getChecklist,
   editTicket,
   addTicket,
-  createProject
+  createProject,
+  deleteTicket
 } = require("./controllers/projectController");
 
 app.get('/', (req, res) => {
@@ -32,6 +36,10 @@ app.get('/projects', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/html/projects.html'));
 })
 
+app.get('/user', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/html/profile.html'));
+})
+
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.static(path.join(__dirname, "../node_modules")));
 
@@ -39,13 +47,19 @@ app.use(express.static(path.join(__dirname, "../node_modules")));
 app.put(`/api/user/auth`, register);
 app.post(`/api/user/auth`, login);
 
+app.put(`/api/users/`, updateUser);
+app.get(`/api/users/`, getID);
+app.delete(`/api/users/`, deleteUser);
+
+
+
 app.get(`/api/projects/single`, getProject);
 app.get(`/api/projects`, getProjects);
 app.post(`/api/projects`, getTicket);
 app.post(`/api/createproject`, createProject);
 
 
-
+app.delete(`/api/tickets/:id`, deleteTicket);
 app.get(`/api/tickets/:id`, getSingleTicket);
 app.get(`/api/comments/:id`, getComments);
 app.get(`/api/checkbox/:id`, getChecklist);

@@ -54,8 +54,9 @@ const loginUser = () => {
     axios
       .post(baseURL, signIn)
       .then((response) => {
-        localStorage.setItem("username", response.data);
-        if (response.data === username.value) {
+        sessionStorage.setItem("username", response.data.user_username);
+        sessionStorage.setItem("user_id", response.data.user_id);
+        if (response.data.user_username === username.value) {
             window.location.href = "/projects";
         }
       })
@@ -75,7 +76,8 @@ const registerUser = () => {
         axios
           .put(baseURL, registerUsr)
           .then((response) => {
-            localStorage.setItem("username", response.data);
+            sessionStorage.setItem("username", response.data.user_username);
+            sessionStorage.setItem("user_id", response.data.user_id)
             window.location.href = "/projects";
           })
           .catch((error) => console.log(error));

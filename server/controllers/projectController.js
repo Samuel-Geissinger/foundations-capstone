@@ -67,13 +67,12 @@ module.exports = {
   editTicket: (req, res) => {
     const { ticketName, ticketNotes, ticketPriority, ticketID, ticketDue } =
       req.body;
-
     sequelize
       .query(
         `
         UPDATE tickets
         SET ticket_name = '${ticketName}',
-          ticket_due = ${ticketDue},
+          ticket_due = '${ticketDue}',
           ticket_notes = '${ticketNotes}',
           ticket_priority = ${ticketPriority}
         WHERE ticket_id = ${ticketID};
@@ -89,8 +88,11 @@ module.exports = {
   },
 
   deleteTicket: (req, res) => {
-    const { ticketID } = req.body;
-    sequelize.query(`DELETE FROM tickets WHERE ticket_id = ${ticketID};`);
+    const ticketID = req.params.id;
+    sequelize.query(`
+      DELETE FROM tickets 
+      WHERE ticket_id = ${ticketID};`
+    ).then(dbRes => {res.status(200).send('Deleted Ticket')});
   },
 
   deleteProject: (req, res) => {
