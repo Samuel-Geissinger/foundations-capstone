@@ -30,13 +30,13 @@
         <div class="header-text">Add Ticket</div>
         <div id="top-content">
             <label>Name: <input type="text" id="new-name" /></label>
-            <label>Created: 2022/02/05</label>
+            <label id="created-date-ticket">Created: 2022/02/05</label>
         </div>
         <fieldset>
             <legend style="text-align: center;">Notes</legend>
             <textarea style="width: 100%;" rows="10" spellcheck="true" id="new-notes"></textarea>
         </fieldset>
-        <div id="bottom-content">
+        <footer id="bottom-content">
 
             <label>Priority: 
                 <select id="new-priority-level-select">
@@ -53,7 +53,7 @@
 
                 </select>
             </label>
-        </div>
+        </footer>
             
         <label>Due Date: <input type="date" id="new-due-date" /></label>
         <button id="create-new-ticket">Create new ticket</button>
@@ -62,7 +62,7 @@
     
     
     <dialog closed="true" id="create-project">
-        <div class="header-text">Add Project</div>
+        <header class="header-text">Add Project</header>
         <label>Name: <input type="text" id="create-project-input" /></label>
         <button id="save-new-project">Save</button>
         <button id="close-new-project">Close</button>

@@ -31,11 +31,6 @@ const getAllTickets = () => {
     .then((response) => {
         comboBox.options.length = 0;
         projectAttach.options.length = 0;
-      
-        // for(let i = comboBox.options.length; i > -1; i--) {
-        //     comboBox.remove(i);
-        //     projectAttach.remove(i);
-        // }
 
         const all = document.createElement("option");
         all.value = 'all';
@@ -43,17 +38,17 @@ const getAllTickets = () => {
         comboBox.add(all);
 
         response.data.map((e) => {
-        const options = document.createElement("option");
-        options.text = e.project_name;
-        options.value = `project_id=${e.project_id}`;
-        comboBox.add(options);
-        
-        
-        
-        const option = document.createElement("option");
-        option.text = e.project_name;
-        option.value = `project_id=${e.project_id}`;
-        projectAttach.add(option);
+          const options = document.createElement("option");
+          options.text = e.project_name;
+          options.value = `project_id=${e.project_id}`;
+          comboBox.add(options);
+          
+          
+          
+          const option = document.createElement("option");
+          option.text = e.project_name;
+          option.value = `project_id=${e.project_id}`;
+          projectAttach.add(option);
         });
         response.data.map((e) => getTicket(e));
     })
@@ -71,7 +66,6 @@ const getProjects = () => {
         axios
           .get(
             `${baseURL}/single?username=${username}&project_id=${splitValue[1]}`
-            //localStorage.getItem("username")
           )
           .then((response) => response.data.map((e) => getTicket(e)));
     }
@@ -357,6 +351,14 @@ addProjectBtn.addEventListener('click', (e) => {
 
 addTicketBtn.addEventListener('click', (e) => {
   e.preventDefault();
+  const today = new Date();
+  const currentDate =
+    today.getFullYear() +
+    "/" +
+    String(today.getMonth() + 1).padStart(2, "0") +
+    "/" +
+    String(today.getDate()).padStart(2, "0");
+  document.getElementById('created-date-ticket').innerHTML = `Date Created: ${currentDate}`
   ticketDialog.show();
 });
 
