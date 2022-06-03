@@ -191,6 +191,8 @@ module.exports = {
         INSERT INTO user_project (user_id, project_id)
         SELECT ${user_id}, project_id
         FROM new_project;
-    `).then((dbRes) => res.status(200).send(dbRes)).catch((err) => console.log(err));
+    `)
+    .then((dbRes) => res.status(200).send(dbRes))
+    .catch((err) => console.log(err));
   }
 };
